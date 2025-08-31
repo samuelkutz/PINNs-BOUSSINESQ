@@ -7,8 +7,8 @@ import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
 
-neuron = 12
-layer = 4
+neuron = 6
+layer = 3
 
 # CUDA support
 if torch.cuda.is_available():
@@ -25,14 +25,19 @@ torch.cuda.manual_seed_all(seed) # GPUs
 from PINN.PINN import PINN
 from BOUSSINESQ.BOUSSINESQ import Boussinesq
 
-boussinesq = Boussinesq(x_min=-30.0, x_max=30.0, t_min=0.0, t_max=15.0, a=0, b=0)
+boussinesq = Boussinesq(x_min=-30.0, x_max=30.0, t_min=0.0, t_max=15.0, a=1e-1, b=1e-1)
 
-# monta a PINN  
 model = PINN(
-    input_size=2, output_size=2, neurons=neuron, hidden_layers=layer,
-    Boussinesq=boussinesq, domain_points=5000, ic_points=200
+    input_size=2, output_size=2, neurons=50, hidden_layers=4,
+    Boussinesq=boussinesq,
+    domain_points=5000,
+    ic_points=200,
+    optimizer_name="adam",
+    strategy="rar",      # <-- ESCOLHE A ESTRATÉGIA
+    N_add=500,           # <-- Número de pontos a adicionar
+    adapt_every=500      # <-- Frequência
 )
+model.train(boussinesq, epochs=15000)
 
-model.train(boussinesq, epochs=9999, adapt_every=1000)  # use menos épocas para teste rápido
 
 torch.save(model, f'./PINN/pinn_solution_{boussinesq.a}_{boussinesq.b}.pth')

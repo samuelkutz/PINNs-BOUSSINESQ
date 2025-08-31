@@ -7,9 +7,6 @@ import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
 
-neuron = 8
-layer = 2
-
 # CUDA support
 if torch.cuda.is_available():
     device = torch.device('cuda')
